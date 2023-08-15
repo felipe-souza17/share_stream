@@ -1,5 +1,5 @@
 import UserModel from "../models/UserModel";
-import { Response } from "express";
+import { Request, Response } from "express";
 
 const getUser = async (request, response: Response) => {
   const userId = Number(request.params.user_id)
@@ -16,4 +16,16 @@ const getUser = async (request, response: Response) => {
   }
 }
 
-export default {getUser}
+const userLogin = async(request, response: Response) => {
+  const { userEmail, userPassword } = request.query
+
+  try {
+    const user = await UserModel.userLogin(userEmail, userPassword)
+
+    if(!user) return response.status(400).json({message: "Login inválido, verifique os campos e tente novamente"})
+    return response.json(user)
+  } catch (error) {
+    return response.status(500).json({message: "Erro ao tentar logar"})
+  }
+}
+export default {getUser, userLogin}
