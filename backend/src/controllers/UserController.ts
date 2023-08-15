@@ -11,6 +11,7 @@ const getUser = async (request, response: Response) => {
 
     return response.json(user)
   } catch(error) {
+    if(Number.isNaN(userId)) return response.status(400).json({message: "Id inválido, tente novamente com um valor numérico"})
     return response.status(500).json({message: "Erro ao buscar usuário"})
   }
 }
