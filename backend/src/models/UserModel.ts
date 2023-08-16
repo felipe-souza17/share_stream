@@ -20,7 +20,19 @@ const userLogin = async (userEmail: string, userPassword: string) => {
   return doUserLogin
 }
 
+const createUser = async (params: User) => {
+  const newUser = Object.values(params)
+  console.log(newUser)
+  const createUserQuery = "insert into usuarios(nome_usuario, login_usuario, senha_usuario, email_usuario, biografia_usuario, data_nascimento_usuario, data_cadastro_usuario, data_login_usuario, celular_usuario, usuario_ativo) values($1, $2, $3, $4, $5, $6, localtimestamp, localtimestamp, $7, true) returning id_usuario, nome_usuario, login_usuario, senha_usuario, email_usuario, biografia_usuario, data_nascimento_usuario, data_cadastro_usuario, data_login_usuario, celular_usuario"
+
+  const createdUser = (await db.query(createUserQuery, newUser)).rows
+
+  if(createdUser.length === 0) return null
+  return createdUser
+}
+
 export default {
   getUserByid,
-  userLogin
+  userLogin,
+  createUser
 }
