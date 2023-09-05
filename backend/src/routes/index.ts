@@ -1,4 +1,5 @@
 import express, {Express} from 'express'
+import user from './User'
 
 const routes = (app: Express) => {
   app.route('/').get((req, res) => {
@@ -8,7 +9,7 @@ const routes = (app: Express) => {
     })
   })
 
-  app.use(express.json())
+  app.use(express.json(), user)
 }
 
 export default routes
