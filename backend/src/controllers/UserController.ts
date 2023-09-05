@@ -20,8 +20,8 @@ const getUser = async (request: any, response: Response) => {
   }
 }
 
-const userLogin = async(request: any, response: Response) => {
-  const { userEmail, userPassword } = request.query
+const userLogin = async(request: Request, response: Response) => {
+  const { userEmail, userPassword } = request.body
 
   
   try {
@@ -30,7 +30,7 @@ const userLogin = async(request: any, response: Response) => {
     
     if(!user) return response.status(400).json({message: "Login inválido, verifique os campos e tente novamente"})
 
-    if(await validateUserLogin(userPassword, user[0].senha_usuario)) return response.json({
+    if(await validateUserLogin(userPassword, String(user[0].senha_usuario))) return response.json({
       id_usuario: user[0].id_usuario,
       login_usuario: user[0].login_usuario,
       email_usuario: user[0].email_usuario
@@ -42,14 +42,13 @@ const userLogin = async(request: any, response: Response) => {
   }
 }
 
-const registerUser = async (request: any, response: Response) => {
+const registerUser = async (request: Request, response: Response) => {
   const requestParams: User = request.body
 
-  
   const registerUserData: User = {
     nome_usuario: requestParams.nome_usuario,
     login_usuario: requestParams.login_usuario.toLowerCase(),
-    senha_usuario: await passwordEncriptyon(requestParams.senha_usuario),
+    senha_usuario: await passwordEncriptyon(String(requestParams.senha_usuario)),
     email_usuario: requestParams.email_usuario,
     biografia_usuario: requestParams.biografia_usuario,
     data_nascimento_usuario: requestParams.data_nascimento_usuario,
@@ -57,7 +56,7 @@ const registerUser = async (request: any, response: Response) => {
   }
   
   try {
-    const user = await UserModel.createUser(registerUserData)
+    const user = await UserModel.createUser(registerUserData)    
 
     if(!user) return response.status(400).json({message: "Erro ao tentar cadastrar"})
     return response.status(201).json(user)
@@ -65,6 +64,28 @@ const registerUser = async (request: any, response: Response) => {
     console.log(error)
     return response.status(500).json({message: "Erro interno no servidor ao tentar cadastrar"})
   }
-} 
+}
 
-export default {getUser, userLogin, registerUser}
+const editUser = async (request: Request, response: Response) => {
+  const { id_usuario, nome_usuario, login_usuario, email_usuario, biografia_usuario, data_nascimento_usuario, celular_usuario }: User = request.body
+
+  const editUserData: User = {
+    id_usuario: Number(id_usuario),
+    nome_usuario: nome_usuario,
+    login_usuario: login_usuario,
+    email_usuario: email_usuario,
+    biografia_usuario: biografia_usuario,
+    celular_usuario: celular_usuario
+  }
+  try {
+    const user = await UserModel.editUser(editUserData)
+
+    if(!user) return response.status(400).json({message: "Erro ao tentar editar"})
+    return response.status(200).json(user)
+  } catch (error) {
+    console.log(error)
+    return response.status(500).json({message: "Erro interno no servidor ao tentar editar"})
+  }
+}
+
+export default {getUser, userLogin, registerUser, editUser}
