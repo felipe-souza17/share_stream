@@ -88,4 +88,20 @@ const editUser = async (request: Request, response: Response) => {
   }
 }
 
-export default {getUser, userLogin, registerUser, editUser}
+const activeProfile = async(request: Request, response: Response
+  ) => {
+
+    const { id_usuario, usuario_ativo}: User = request.body
+
+    try {
+      const user = await UserModel.activeProfile(Boolean(usuario_ativo), Number(id_usuario))
+
+      if(!user) return response.status(400).json({message: `Erro ao tentar ${Boolean(usuario_ativo) ? 'ativar' : 'desativar'} o usuário`})
+      return response.status(200).json(user)
+    } catch (error) {
+      console.log(error)
+      return response.status(400).json({message: `Erro interno no servidor ao tentar ${Boolean(usuario_ativo) ? 'ativar' : 'desativar'} o usuário`})
+    }
+  }
+
+export default {getUser, userLogin, registerUser, editUser, activeProfile}

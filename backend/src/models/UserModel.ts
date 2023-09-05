@@ -39,9 +39,19 @@ const editUser = async (user: User) => {
   return editedUser
 }
 
+const activeProfile = async(usuario_ativo: boolean,id_usuario: number) => {
+  const activeProfileQuery = "update usuarios set usuario_ativo = $2 where id_usuario = $1 returning usuario_ativo"
+
+  const userActiveDisable = (await db.query(activeProfileQuery, [id_usuario, usuario_ativo])).rows
+
+  if(userActiveDisable.length === 0) return null
+  return userActiveDisable
+}
+
 export default {
   getUserByid,
   userLogin,
   createUser,
-  editUser
+  editUser,
+  activeProfile
 }
